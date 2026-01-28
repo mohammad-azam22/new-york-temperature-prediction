@@ -1,0 +1,53 @@
+# Grafana dashboard provisioning configuration
+# This file tells Grafana WHERE dashboards are stored and HOW to load them
+
+apiVersion: 1   # Grafana provisioning API version (currently always 1)
+
+providers:
+
+  # A dashboard provider defines a source from which Grafana loads dashboards
+  - name: "My Dashboards"   # Logical name for this provider (visible internally)
+
+    orgId: 1               # Grafana organization ID (1 = default org)
+
+    folder: ""             # Grafana UI folder name
+                            # Empty string = dashboards appear in "General"
+
+    folderUid: ""          # Unique ID for the folder
+                            # Empty = Grafana auto-generates one
+
+    type: file             # Dashboards are loaded from files on disk
+
+    disableDeletion: false # If false:
+                            # - Dashboards deleted from disk
+                            #   will also be removed from Grafana
+
+    updateIntervalSeconds: 10
+                            # How often Grafana rescans the directory (in seconds)
+                            # Useful during development when dashboards change
+
+    allowUpdates: false    # If false:
+                            # - Changes made via Grafana UI are NOT saved
+                            # - Disk files remain the source of truth
+                            # Set to true only if you want UI edits to persist
+
+    options:
+      # Absolute path INSIDE the Grafana container
+      # This path must match the docker-compose volume mount
+      path: /opt/grafana/dashboards
+
+      # When true:
+      # Subfolders inside /opt/grafana/dashboards
+      # become folders inside Grafana UI automatically
+      #
+      # Example:
+      # /opt/grafana/dashboards/
+      # ├── data_drift/
+      # │   └── drift.json
+      # └── model_performance/
+      #     └── accuracy.json
+      #
+      # Results in two folders in Grafana UI:
+      # - data_drift
+      # - model_performance
+      foldersFromFilesStructure: true

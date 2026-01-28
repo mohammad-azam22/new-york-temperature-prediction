@@ -1,0 +1,48 @@
+# -------------------------------------------------------------------
+# Grafana data source provisioning configuration
+#
+# This file defines which data sources Grafana should create
+# automatically on startup (no manual UI setup required).
+# -------------------------------------------------------------------
+
+# Provisioning API version (currently always 1)
+apiVersion: 1
+
+# List of data sources to create or update in Grafana
+datasources:
+
+  # Logical name shown in Grafana UI
+  - name: PostgreSQL
+
+    # Data source type (must match Grafana's supported types)
+    type: postgres
+
+    # How Grafana accesses the database
+    # proxy = Grafana server connects to Postgres
+    # direct = browser connects directly (not recommended)
+    access: proxy
+
+    # Database connection URL
+    # "db" is the Docker Compose service name
+    # "5432" is the Postgres default port
+    #
+    # IMPORTANT:
+    # This must be reachable FROM INSIDE the Grafana container,
+    # not from your host machine.
+    url: db:5432
+
+    # Database user
+    user: postgres
+
+    # Sensitive values go here
+    # These are encrypted and NOT shown in plain text in Grafana UI
+    secureJsonData:
+      password: "example"
+
+    jsonData:
+      # Disable SSL (fine for local Docker setups)
+      # For production, this is usually "require" or "verify-full"
+      sslmode: "disable"
+      
+      # Name of the Postgres database to connect to
+      database: test

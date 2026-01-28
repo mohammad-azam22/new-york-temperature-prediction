@@ -1,0 +1,113 @@
+version: "3.7"
+
+volumes:
+  grafana_data: {}
+
+networks:
+  front-tier:
+  back-tier:
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    networks:
+      - back-tier
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - back-tier
+      - front-tier
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    ports:
+      - "3000:3000"
+
+    volumes:
+      # ------------------------------------------------------------------
+      # DATA SOURCE PROVISIONING
+      #
+      # Format: <host_path> : <container_path> : <mode>
+      #
+      # This line mounts the data source configuration file from your
+      # local machine into Grafana’s special provisioning directory.
+      #
+      # On startup, Grafana automatically scans:
+      #   /etc/grafana/provisioning/datasources/
+      #
+      # Any YAML file found there is read and used to create data sources
+      # automatically (e.g., Postgres, Prometheus, etc.).
+      #
+      # Result:
+      # - No manual "Add data source" in UI
+      # - Fully reproducible setup
+      # - Perfect for CI/CD and ML monitoring
+      #
+      # ":ro" means read-only → Grafana can read the config but cannot
+      # modify it, keeping configuration immutable and Git-controlled.
+      # ------------------------------------------------------------------
+      - ./config/grafana_datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+
+      # ------------------------------------------------------------------
+      # DASHBOARD PROVISIONING CONFIG
+      #
+      # This file does NOT contain dashboards.
+      #
+      # Instead, it tells Grafana:
+      # - Dashboards are stored as files
+      # - Where those files are located inside the container
+      #
+      # Grafana scans:
+      #   /etc/grafana/provisioning/dashboards/
+      #
+      # Typical content of this file points Grafana to:
+      #   /opt/grafana/dashboards
+      #
+      # Grafana then continuously watches that directory and loads
+      # any dashboard JSON files found there.
+      #
+      # ":ro" keeps provisioning rules immutable.
+      # ------------------------------------------------------------------
+      - ./config/grafana_dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+
+      # ------------------------------------------------------------------
+      # ACTUAL DASHBOARD FILES (JSON)
+      #
+      # This mounts a LOCAL DIRECTORY into the Grafana container.
+      #
+      # Example local structure:
+      #   ./dashboards/
+      #     ├── data_drift.json
+      #     ├── model_performance.json
+      #     └── evidently_metrics.json
+      #
+      # Inside the container, these files appear at:
+      #   /opt/grafana/dashboards
+      #
+      # Grafana:
+      # 1. Reads dashboards.yaml (above)
+      # 2. Learns dashboards live at /opt/grafana/dashboards
+      # 3. Automatically loads every JSON file in that directory
+      #
+      # Result:
+      # - No manual dashboard import
+      # - Dashboards versioned in Git
+      # - Instant reload on container restart
+      # ------------------------------------------------------------------
+      - ./dashboards:/opt/grafana/dashboards
+
+    networks:
+      - back-tier
+      - front-tier
+
+    restart: always
