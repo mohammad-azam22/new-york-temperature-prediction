@@ -50,13 +50,17 @@ The training pipeline:
 
 1. Downloaded **New York historical weather data (2022)** using the Open-Meteo API
 2. Selected target variable: `temperature_2m`
-3. Trained multiple models:
-   - Linear Regression
-   - Lasso, Ridge, Elastic Net
-   - Decision Tree
-   - Random Forest
-   - Support Vector Regressor (SVR)
-   - Multi-Layer Perceptron
+3. Trained multiple models:  
+   | Model | Train MAE | Train RMSE | Train R² Score | Validation MAE | Validation RMSE | Validation R² Score |
+   |-------|-----------|------------|----------------|----------|-----------|----------------|
+   | Linear Regression | 0.3664 | 0.5766 | 0.9956 | 0.3722 | 0.5435 | 0.9961 |
+   | Lasso | 1.7666 | 2.1240 | 0.9416 | 1.7552 | 2.1333 | 0.9414 |
+   | Ridge | 0.3626 | 0.5699 | 0.9957 | 0.3682 | 0.5373 | 0.9962 |
+   | Elastic Net | 2.8368 | 3.3264 | 0.8568 | 2.8047 | 3.2952 | 0.8602 |
+   | Decision Tree | 0.0 | 0.0 | 1.0 | 0.2613 | 0.3770 | 0.9981 |
+   | **Random Forest** | 0.0422 | 0.0696 | 0.9999 | 0.1121 | 0.1935 | 0.9995 |
+   | Support Vector Regressor (SVR) | 0.4025 | 0.9685 | 0.9878 | 0.4965 | 1.2728 | 0.9791 |
+   | Multi-Layer Perceptron | 1.4410 | 2.0596 | 0.9451 | 0.6264 | 0.9363 | 0.9887 |
 4. Logged experiments, parameters, and metrics to **MLflow**
 5. Selected **Random Forest** as the best model based on validation metrics
 6. Retrained the best model on the full dataset  
