@@ -97,7 +97,7 @@ This allows tracking model behavior over time and understanding whether the data
 
 ## 📊 Dashboards & Alerting
 
-![Grafana Dashboard](./Grafana%20Dashboard.png)
+![Grafana Dashboard](./Grafana%20Dashboard.pn)
 
 Using **Grafana**:
 
